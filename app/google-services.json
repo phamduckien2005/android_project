@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "123320103491",
+    "project_id": "appchitieu-master",
+    "storage_bucket": "appchitieu-master.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123320103491:android:f342c1596773faa76e1af6",
+        "android_client_info": {
+          "package_name": "com.example.sqlite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "123320103491-fh8kb9rcv5jsga0tup4sirr459s7ah5m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sqlite",
+            "certificate_hash": "01f30ef39ef05b0e775877177db4f9e8fcc8c77f"
+          }
+        },
+        {
+          "client_id": "123320103491-bc2kdr7keh5v2ca37al5kl0u6qql3iqb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuZ_OpJCIO_cpVisNXh5XATfoCaV11ECs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "123320103491-bc2kdr7keh5v2ca37al5kl0u6qql3iqb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

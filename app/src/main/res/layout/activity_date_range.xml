@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_date_range"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
+        app:navigationIconTint="?attr/colorOnPrimary">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Chọn thời gian"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tùy chỉnh phạm vi"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:id="@+id/layout_start_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="12dp"
+                android:background="?attr/colorSurface"
+                android:elevation="1dp"
+                android:layout_marginBottom="8dp"
+                android:paddingHorizontal="12dp"
+                android:clickable="true"
+                android:focusable="true">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Từ ngày"
+                    android:textColor="?android:attr/textColorPrimary" />
+                <TextView
+                    android:id="@+id/tv_start_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chọn ngày"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_end_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="12dp"
+                android:background="?attr/colorSurface"
+                android:elevation="1dp"
+                android:layout_marginBottom="16dp"
+                android:paddingHorizontal="12dp"
+                android:clickable="true"
+                android:focusable="true">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Đến ngày"
+                    android:textColor="?android:attr/textColorPrimary" />
+                <TextView
+                    android:id="@+id/tv_end_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chọn ngày"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn nhanh (Đường tắt)"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="12sp"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView android:id="@+id/opt_all" style="@style/DateRangeItem" android:text="Tất cả thời gian" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_today" style="@style/DateRangeItem" android:text="Hôm nay" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_yesterday" style="@style/DateRangeItem" android:text="Hôm qua" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_this_week" style="@style/DateRangeItem" android:text="Tuần này" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_last_week" style="@style/DateRangeItem" android:text="Tuần trước" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_this_month" style="@style/DateRangeItem" android:text="Tháng này" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_last_month" style="@style/DateRangeItem" android:text="Tháng trước" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_this_year" style="@style/DateRangeItem" android:text="Năm nay" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_last_year" style="@style/DateRangeItem" android:text="Năm ngoái" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_last_7_days" style="@style/DateRangeItem" android:text="7 ngày gần đây" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_last_30_days" style="@style/DateRangeItem" android:text="30 ngày gần đây" android:textColor="?android:attr/textColorPrimary" />
+            <TextView android:id="@+id/opt_last_90_days" style="@style/DateRangeItem" android:text="90 ngày gần đây" android:textColor="?android:attr/textColorPrimary" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <Button
+        android:id="@+id/btn_confirm_date"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_margin="16dp"
+        android:text="ÁP DỤNG LỌC"
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="?attr/colorOnPrimary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"/>
+</LinearLayout>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    
+    <!-- New Soft Light Palette -->
+    <color name="primary_pink">#F06292</color> <!-- Màu hồng tiêu đề -->
+    <color name="primary_dark_pink">#C2185B</color> <!-- Màu hồng đậm cho nút back -->
+    <color name="primary_light">#FCE4EC</color> <!-- Màu hồng nhạt bổ trợ -->
+    <color name="bg_light">#F8F9FA</color> <!-- Nền app xám cực nhạt -->
+    <color name="text_main">#2D3436</color> <!-- Chữ chính màu xám đậm (dễ nhìn hơn đen) -->
+    <color name="text_sub">#636E72</color> <!-- Chữ phụ xám nhạt -->
+    
+    <color name="income_green">#4CAF50</color>
+    <color name="expense_red">#E91E63</color>
+    <color name="gold">#FFD700</color>
+</resources>
