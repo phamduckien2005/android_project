@@ -235,19 +235,42 @@ public class MainActivity extends AppCompatActivity {
             int percent = (int) Math.min(100, (spent / limit) * 100);
             int color = remaining < 0 ? Color.parseColor("#D32F2F") : Color.parseColor("#1976D2");
 
+            LinearLayout itemBox = new LinearLayout(this);
+            itemBox.setOrientation(LinearLayout.VERTICAL);
+            itemBox.setPadding(18, 16, 18, 16);
+            itemBox.setBackgroundResource(R.drawable.bg_auth_input);
+            LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            itemParams.setMargins(0, 0, 0, 12);
+            layoutBudgetOverview.addView(itemBox, itemParams);
+
             TextView title = new TextView(this);
-            title.setText(String.format(
+            title.setText(category);
+            title.setTextColor(Color.parseColor("#111827"));
+            title.setTextSize(16);
+            title.setTypeface(null, android.graphics.Typeface.BOLD);
+            itemBox.addView(title);
+
+            TextView detail = new TextView(this);
+            detail.setText(String.format(
                     Locale.getDefault(),
-                    "%s: đã chi %,.0f / %,.0f đ, còn lại %,.0f đ",
-                    category,
+                    "Đã chi %,.0f / %,.0f đ",
                     spent,
-                    limit,
-                    Math.max(0, remaining)
+                    limit
             ));
-            title.setTextColor(color);
-            title.setTextSize(12);
-            title.setPadding(0, 8, 0, 3);
-            layoutBudgetOverview.addView(title);
+            detail.setTextColor(color);
+            detail.setTextSize(14);
+            detail.setPadding(0, 8, 0, 4);
+            itemBox.addView(detail);
+
+            TextView remainingView = new TextView(this);
+            remainingView.setText(String.format(Locale.getDefault(), "Còn lại: %,.0f đ", Math.max(0, remaining)));
+            remainingView.setTextColor(Color.parseColor("#4B5563"));
+            remainingView.setTextSize(13);
+            remainingView.setPadding(0, 0, 0, 8);
+            itemBox.addView(remainingView);
 
             ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
             progressBar.setMax(100);
@@ -255,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(color));
             }
-            layoutBudgetOverview.addView(progressBar, new LinearLayout.LayoutParams(
+            itemBox.addView(progressBar, new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     8
             ));
