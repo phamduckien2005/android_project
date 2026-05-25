@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/colorSurface" />
+    <solid android:color="@color/auth_card" />
     <stroke
         android:width="1dp"
-        android:color="#DADDE2" />
-    <corners android:radius="12dp" />
+        android:color="#BFD8F6" />
+    <corners android:radius="28dp" />
 </shape>

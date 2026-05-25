@@ -1,8 +1,5 @@
 package com.example.sqlite;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -18,7 +15,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -28,38 +24,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AiReceiptActivity extends AppCompatActivity {
+    private static final int MAX_IMAGE_SIZE = 1600;
+
     private ImageView ivReceiptPreview;
-    private TextView tvAiStatus;
-    private EditText edtAiTitle, edtAiAmount, edtAiCategory;
+    private TextView tvAiStatus, tvChatUser, tvChatAssistant, tvAiJson;
+    private EditText edtChatMessage, edtAiTitle, edtAiAmount, edtAiCategory;
     private ProgressBar progressAi;
     private Bitmap selectedBitmap;
+    private GeminiReceiptService.ReceiptResult pendingReceiptResult;
     private DatabaseHelper dbHelper;
     private boolean currentReceiptSaved = false;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    private final ActivityResultLauncher<Void> takePictureLauncher =
-            registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), bitmap -> {
-                if (bitmap != null) {
-                    selectedBitmap = bitmap;
-                    currentReceiptSaved = false;
-                    ivReceiptPreview.setImageBitmap(bitmap);
-                    tvAiStatus.setText("Ảnh đã sẵn sàng để AI phân tích.");
-                }
-            });
 
     private final ActivityResultLauncher<String> pickImageLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
                     loadBitmapFromUri(uri);
-                }
-            });
-
-    private final ActivityResultLauncher<String> requestCameraPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    takePictureLauncher.launch(null);
-                } else {
-                    Toast.makeText(this, "Cần quyền camera để chụp hóa đơn", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -77,6 +57,10 @@ public class AiReceiptActivity extends AppCompatActivity {
     private void initViews() {
         ivReceiptPreview = findViewById(R.id.iv_receipt_preview);
         tvAiStatus = findViewById(R.id.tv_ai_status);
+        tvChatUser = findViewById(R.id.tv_chat_user);
+        tvChatAssistant = findViewById(R.id.tv_chat_assistant);
+        tvAiJson = findViewById(R.id.tv_ai_json);
+        edtChatMessage = findViewById(R.id.edt_chat_message);
         edtAiTitle = findViewById(R.id.edt_ai_title);
         edtAiAmount = findViewById(R.id.edt_ai_amount);
         edtAiCategory = findViewById(R.id.edt_ai_category);
@@ -93,52 +77,116 @@ public class AiReceiptActivity extends AppCompatActivity {
     }
 
     private void handleEvents() {
-        findViewById(R.id.btn_take_receipt_photo).setOnClickListener(v -> openCamera());
         findViewById(R.id.btn_pick_receipt_photo).setOnClickListener(v -> pickImageLauncher.launch("image/*"));
+        findViewById(R.id.btn_send_chat).setOnClickListener(v -> sendChatMessage());
         findViewById(R.id.btn_analyze_receipt).setOnClickListener(v -> analyzeReceipt());
         findViewById(R.id.btn_save_ai_transaction).setOnClickListener(v -> saveTransactionFromFields());
     }
 
-    private void openCamera() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            takePictureLauncher.launch(null);
-        } else {
-            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
-        }
-    }
-
     private void loadBitmapFromUri(Uri uri) {
-        try (InputStream inputStream = getContentResolver().openInputStream(uri)) {
-            selectedBitmap = BitmapFactory.decodeStream(inputStream);
+        try {
+            selectedBitmap = decodeScaledBitmap(uri);
+            if (selectedBitmap == null) {
+                throw new IllegalStateException("File ảnh không hợp lệ");
+            }
+
             currentReceiptSaved = false;
             ivReceiptPreview.setImageBitmap(selectedBitmap);
+            ivReceiptPreview.setVisibility(View.VISIBLE);
+            clearReceiptFields();
+            pendingReceiptResult = null;
+            tvChatUser.setText("Bạn đã tải lên một ảnh hóa đơn.");
+            tvChatAssistant.setText("Mình đã nhận ảnh. Bạn có thể hỏi về ảnh này hoặc bấm Phân tích hóa đơn để lấy JSON.");
+            tvAiJson.setText("{ }");
             tvAiStatus.setText("Ảnh đã sẵn sàng để AI phân tích.");
         } catch (Exception e) {
             Toast.makeText(this, "Không đọc được ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
+    private Bitmap decodeScaledBitmap(Uri uri) throws Exception {
+        BitmapFactory.Options boundsOptions = new BitmapFactory.Options();
+        boundsOptions.inJustDecodeBounds = true;
+        try (InputStream boundsStream = getContentResolver().openInputStream(uri)) {
+            BitmapFactory.decodeStream(boundsStream, null, boundsOptions);
+        }
+
+        BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
+        decodeOptions.inSampleSize = calculateInSampleSize(boundsOptions, MAX_IMAGE_SIZE, MAX_IMAGE_SIZE);
+        try (InputStream imageStream = getContentResolver().openInputStream(uri)) {
+            return BitmapFactory.decodeStream(imageStream, null, decodeOptions);
+        }
+    }
+
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        int height = options.outHeight;
+        int width = options.outWidth;
+        int inSampleSize = 1;
+
+        while ((height / inSampleSize) > reqHeight || (width / inSampleSize) > reqWidth) {
+            inSampleSize *= 2;
+        }
+
+        return inSampleSize;
+    }
+
+    private void sendChatMessage() {
+        String message = edtChatMessage.getText().toString().trim();
+        if (message.isEmpty()) {
+            Toast.makeText(this, "Nhập câu hỏi cho AI trước", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        setLoading(true);
+        edtChatMessage.setText("");
+        tvChatUser.setText(message);
+        tvChatAssistant.setText("Mình đang trả lời...");
+
+        executorService.execute(() -> {
+            try {
+                String answer = new GeminiReceiptService().sendChatMessage(message, selectedBitmap);
+                runOnUiThread(() -> {
+                    setLoading(false);
+                    tvChatAssistant.setText(answer);
+                    tvAiStatus.setText("AI đã trả lời.");
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    setLoading(false);
+                    tvChatAssistant.setText("Mình chưa trả lời được lúc này.");
+                    tvAiStatus.setText(e.getMessage());
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
     private void analyzeReceipt() {
         if (selectedBitmap == null) {
-            Toast.makeText(this, "Hãy chụp hoặc chọn ảnh hóa đơn trước", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Hãy tải ảnh hóa đơn lên trước", Toast.LENGTH_SHORT).show();
             return;
         }
 
         setLoading(true);
         tvAiStatus.setText("AI đang đọc hóa đơn...");
+        tvChatAssistant.setText("Mình đang phân tích ảnh và chuẩn hóa kết quả thành JSON.");
 
         executorService.execute(() -> {
             try {
                 GeminiReceiptService.ReceiptResult result = new GeminiReceiptService().analyzeReceipt(selectedBitmap);
                 runOnUiThread(() -> {
                     setLoading(false);
+                    pendingReceiptResult = result;
                     fillReceiptFields(result);
-                    saveTransaction(result);
+                    tvAiJson.setText(result.rawJson);
+                    tvChatAssistant.setText("Đã phân tích xong:\n" + result.rawJson + "\n\nBấm Áp dụng để lưu giao dịch này.");
+                    tvAiStatus.setText("AI đã phân tích xong hóa đơn.");
                 });
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     setLoading(false);
                     tvAiStatus.setText(e.getMessage());
+                    tvChatAssistant.setText("Mình chưa phân tích được hóa đơn này. Hãy kiểm tra ảnh hoặc API key rồi thử lại.");
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
                 });
             }
@@ -151,9 +199,20 @@ public class AiReceiptActivity extends AppCompatActivity {
         edtAiCategory.setText(result.category);
     }
 
+    private void clearReceiptFields() {
+        edtAiTitle.setText("");
+        edtAiAmount.setText("");
+        edtAiCategory.setText("");
+    }
+
     private void saveTransactionFromFields() {
         if (currentReceiptSaved) {
             Toast.makeText(this, "Hóa đơn này đã được lưu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (pendingReceiptResult != null) {
+            saveTransaction(pendingReceiptResult);
             return;
         }
 
@@ -170,7 +229,7 @@ public class AiReceiptActivity extends AppCompatActivity {
 
         try {
             double amount = Double.parseDouble(amountText);
-            saveTransaction(new GeminiReceiptService.ReceiptResult(title, amount, category, ""));
+            saveTransaction(new GeminiReceiptService.ReceiptResult(title, amount, category, "", tvAiJson.getText().toString()));
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Số tiền không hợp lệ", Toast.LENGTH_SHORT).show();
         }
@@ -197,11 +256,14 @@ public class AiReceiptActivity extends AppCompatActivity {
                 result.amount,
                 balance
         ));
+        tvChatAssistant.setText("Giao dịch đã được lưu từ kết quả AI.");
         Toast.makeText(this, "Đã lưu giao dịch từ hóa đơn", Toast.LENGTH_SHORT).show();
     }
 
     private void setLoading(boolean isLoading) {
         progressAi.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        findViewById(R.id.btn_pick_receipt_photo).setEnabled(!isLoading);
+        findViewById(R.id.btn_send_chat).setEnabled(!isLoading);
         findViewById(R.id.btn_analyze_receipt).setEnabled(!isLoading);
         findViewById(R.id.btn_save_ai_transaction).setEnabled(!isLoading);
     }

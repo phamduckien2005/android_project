@@ -1,12 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.Sqlite" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">#FF80AB</item>
+        <item name="colorPrimary">@color/primary_blue</item>
 
-        <item name="android:windowBackground">#121212</item>
+        <item name="android:windowBackground">@color/bg_light</item>
 
-        <item name="colorSurface">#1E1E1E</item>
+        <item name="colorSurface">@color/white</item>
 
-        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorPrimary">@color/text_main</item>
     </style>
 
     <style name="Theme.Sqlite" parent="Base.Theme.Sqlite" />

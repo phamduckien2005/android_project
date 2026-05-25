@@ -142,7 +142,7 @@ public class ReportActivity extends AppCompatActivity {
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         int[] colors = {Color.parseColor("#FF7043"), Color.parseColor("#42A5F5"), Color.parseColor("#AB47BC"), 
-                        Color.parseColor("#26A69A"), Color.parseColor("#FFCA28"), Color.parseColor("#EC407A"), Color.parseColor("#78909C")};
+            Color.parseColor("#26A69A"), Color.parseColor("#FFCA28"), Color.parseColor("#42A5F5"), Color.parseColor("#78909C")};
         dataSet.setColors(colors);
         dataSet.setSliceSpace(2f);
         dataSet.setDrawValues(false);

@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.Sqlite" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/primary_pink</item>
+        <item name="colorPrimary">@color/primary_blue</item>
         <item name="android:windowBackground">@color/bg_light</item>
         <item name="colorSurface">@color/white</item>
 

@@ -37,6 +37,17 @@ public final class UserSession {
                 .apply();
     }
 
+    public static boolean hasActiveSession(Context context) {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null && firebaseUser.getUid() != null && !firebaseUser.getUid().isEmpty()) {
+            return true;
+        }
+
+        SharedPreferences preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        String savedUserId = preferences.getString(KEY_CURRENT_USER_ID, "");
+        return savedUserId != null && !savedUserId.trim().isEmpty();
+    }
+
     public static String getCurrentUserId(Context context) {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null && firebaseUser.getUid() != null && !firebaseUser.getUid().isEmpty()) {

@@ -73,7 +73,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         categories.add(new CategoryAdapter.Category("Ăn uống", android.R.drawable.ic_menu_today, "#FF7043"));
         categories.add(new CategoryAdapter.Category("Di chuyển", android.R.drawable.ic_menu_directions, "#42A5F5"));
         categories.add(new CategoryAdapter.Category("Mua sắm", android.R.drawable.ic_menu_save, "#AB47BC"));
-        categories.add(new CategoryAdapter.Category("Sắc đẹp", android.R.drawable.ic_menu_camera, "#EC407A"));
+        categories.add(new CategoryAdapter.Category("Sắc đẹp", android.R.drawable.ic_menu_camera, "#42A5F5"));
         categories.add(new CategoryAdapter.Category("Ăn vặt", android.R.drawable.ic_menu_view, "#FFA726"));
         categories.add(new CategoryAdapter.Category("Học tập", android.R.drawable.ic_menu_edit, "#66BB6A"));
         categories.add(new CategoryAdapter.Category("Giải trí", android.R.drawable.ic_menu_slideshow, "#FFCA28"));

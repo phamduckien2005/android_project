@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +24,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvHomeGreeting;
     private TextView tvStudentTip, tvBudgetPercent, tvBudgetDesc;
     private ProgressBar pbBudget;
+    private LinearLayout layoutBudgetOverview;
     private View cardTip;
     private ImageView ivTipIcon;
     private RecyclerView rvMainList;
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         tvStudentTip = findViewById(R.id.tv_student_tip);
         tvBudgetPercent = findViewById(R.id.tv_budget_percent);
         tvBudgetDesc = findViewById(R.id.tv_budget_desc);
+        layoutBudgetOverview = findViewById(R.id.layout_budget_overview);
         pbBudget = findViewById(R.id.pb_budget_main);
         cardTip = findViewById(R.id.card_tip);
         ivTipIcon = findViewById(R.id.iv_tip_icon);
@@ -137,20 +141,26 @@ public class MainActivity extends AppCompatActivity {
 
         if (tvStudentTip == null) return;
 
-        double monthlyLimit = 3000000;
-        int usagePercent = (int) ((currentExpense / monthlyLimit) * 100);
+        double walletLimit = dbHelper.getTotalBudgetLimit();
+        double walletSpent = dbHelper.getTotalBudgetSpentSinceReset();
+        int usagePercent = walletLimit > 0 ? (int) ((walletSpent / walletLimit) * 100) : 0;
         if (usagePercent > 100) usagePercent = 100;
 
         if (pbBudget != null) pbBudget.setProgress(usagePercent);
         if (tvBudgetPercent != null) tvBudgetPercent.setText(usagePercent + "%");
         if (tvBudgetDesc != null) {
-            tvBudgetDesc.setText(String.format(
+            if (walletLimit > 0) {
+                tvBudgetDesc.setText(String.format(
                     Locale.getDefault(),
                     "Đã tiêu: %,.0f / %,.0f đ",
-                    currentExpense,
-                    monthlyLimit
+                    walletSpent,
+                    walletLimit
             ));
+            } else {
+                tvBudgetDesc.setText("Chưa đặt hạn mức ví. Bấm Ví để thiết lập.");
+            }
         }
+        renderBudgetOverview();
 
         String tip;
         int color;
@@ -161,12 +171,12 @@ public class MainActivity extends AppCompatActivity {
             color = Color.parseColor("#D32F2F");
             newAlertType = "NEGATIVE";
 
-        } else if (usagePercent > 80) {
+        } else if (walletLimit > 0 && usagePercent > 80) {
             tip = "Ăn mì tôm thôi chứ đợi gì nữa? Sắp hết tiền rồi bạn ơi! 🍜";
             color = Color.parseColor("#E65100");
             newAlertType = "OVER_80";
 
-        } else if (usagePercent > 50) {
+        } else if (walletLimit > 0 && usagePercent > 50) {
             tip = "Tiền trôi hơi nhanh nha. Tém tém lại kẻo cuối tháng húp không khí! 👀";
             color = Color.parseColor("#0277BD");
             newAlertType = "OVER_50";
@@ -204,6 +214,60 @@ public class MainActivity extends AppCompatActivity {
 
         if (ivTipIcon != null)
             ivTipIcon.setColorFilter(color);
+    }
+
+    private void renderBudgetOverview() {
+        if (layoutBudgetOverview == null) return;
+
+        layoutBudgetOverview.removeAllViews();
+        Map<String, Double> budgets = dbHelper.getBudgetLimits();
+        long resetAt = dbHelper.getWalletResetAt();
+        boolean hasBudget = false;
+
+        for (String category : WalletActivity.CATEGORIES) {
+            Double limitValue = budgets.get(category);
+            if (limitValue == null || limitValue <= 0) continue;
+
+            hasBudget = true;
+            double limit = limitValue;
+            double spent = dbHelper.getCategoryExpenseSince(category, resetAt);
+            double remaining = limit - spent;
+            int percent = (int) Math.min(100, (spent / limit) * 100);
+            int color = remaining < 0 ? Color.parseColor("#D32F2F") : Color.parseColor("#1976D2");
+
+            TextView title = new TextView(this);
+            title.setText(String.format(
+                    Locale.getDefault(),
+                    "%s: đã chi %,.0f / %,.0f đ, còn lại %,.0f đ",
+                    category,
+                    spent,
+                    limit,
+                    Math.max(0, remaining)
+            ));
+            title.setTextColor(color);
+            title.setTextSize(12);
+            title.setPadding(0, 8, 0, 3);
+            layoutBudgetOverview.addView(title);
+
+            ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+            progressBar.setMax(100);
+            progressBar.setProgress(percent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(color));
+            }
+            layoutBudgetOverview.addView(progressBar, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    8
+            ));
+        }
+
+        if (!hasBudget) {
+            TextView empty = new TextView(this);
+            empty.setText("Chưa có danh mục nào được đặt hạn mức.");
+            empty.setTextColor(Color.parseColor("#6B7280"));
+            empty.setTextSize(12);
+            layoutBudgetOverview.addView(empty);
+        }
     }
 
     private int lightenColor(int color) {
@@ -251,17 +315,23 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_account_book).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, HistoryActivity.class)));
         findViewById(R.id.btn_add_top).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, AddTransactionActivity.class)));
-        findViewById(R.id.btn_bill).setOnClickListener(v -> startActivity(new Intent(this, ReportActivity.class)));
+        findViewById(R.id.btn_wallet).setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
         findViewById(R.id.btn_view_all).setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_history) startActivity(new Intent(this, HistoryActivity.class));
-            else if (id == R.id.nav_ai_receipt) startActivity(new Intent(this, AiReceiptActivity.class));
-            else if (id == R.id.nav_report) startActivity(new Intent(this, ReportActivity.class));
-            else if (id == R.id.nav_settings)
+            if (id == R.id.nav_home) {
+                return true;
+            } else if (id == R.id.nav_history) {
+                startActivity(new Intent(this, HistoryActivity.class));
+            } else if (id == R.id.nav_ai_receipt) {
+                startActivity(new Intent(this, AiReceiptActivity.class));
+            } else if (id == R.id.nav_report) {
+                startActivity(new Intent(this, ReportActivity.class));
+            } else if (id == R.id.nav_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
-            return id == R.id.nav_home;
+            }
+            return true;
         });
     }
 

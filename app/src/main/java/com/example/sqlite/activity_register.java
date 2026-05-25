@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +20,7 @@ public class activity_register extends AppCompatActivity {
             edtConfirmPassword;
 
     MaterialButton btnRegister;
+    TextView tvLogin;
 
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
@@ -35,6 +37,7 @@ public class activity_register extends AppCompatActivity {
                 findViewById(R.id.edtConfirmPassword);
 
         btnRegister = findViewById(R.id.btnRegister);
+        tvLogin = findViewById(R.id.tvLogin);
 
         preferences = getSharedPreferences(
                 "USER_FILE",
@@ -44,6 +47,10 @@ public class activity_register extends AppCompatActivity {
         editor = preferences.edit();
 
         btnRegister.setOnClickListener(v -> registerUser());
+        tvLogin.setOnClickListener(v -> {
+            startActivity(new Intent(activity_register.this, activity_login.class));
+            finish();
+        });
     }
 
     private void registerUser() {

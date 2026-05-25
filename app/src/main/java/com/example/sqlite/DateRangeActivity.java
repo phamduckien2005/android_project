@@ -50,7 +50,7 @@ public class DateRangeActivity extends AppCompatActivity {
         findViewById(R.id.layout_start_date).setOnClickListener(v -> showDatePicker(true));
         findViewById(R.id.layout_end_date).setOnClickListener(v -> showDatePicker(false));
 
-        // NÚT ÁP DỤNG LỌC (Nút màu hồng dưới cùng)
+        // Nút áp dụng lọc ở cuối màn hình.
         findViewById(R.id.btn_confirm_date).setOnClickListener(v -> {
             // Chuẩn hóa thời gian trước khi kiểm tra
             startCalendar.set(Calendar.HOUR_OF_DAY, 0);

@@ -67,6 +67,11 @@ public class activity_login extends AppCompatActivity {
         preferences = getSharedPreferences("USER_FILE", MODE_PRIVATE);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        if (UserSession.hasActiveSession(this)) {
+            openHome();
+            return;
+        }
+
         facebookCallbackManager = CallbackManager.Factory.create();
 
         GoogleSignInOptions gso =

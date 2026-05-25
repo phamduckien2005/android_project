@@ -18,7 +18,7 @@ import java.util.Map;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "SmartWallet.db";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
     public static final String COLUMN_USER_ID = "user_id";
     public static final String TABLE_MESSAGES = "messages";
     public static final String COLUMN_MSG_ID = "id";
@@ -33,6 +33,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_TIMESTAMP = "timestamp";
     public static final String COLUMN_CATEGORY = "category";
     public static final String COLUMN_IS_EXPENSE = "is_expense";
+    public static final String TABLE_BUDGETS = "budgets";
+    public static final String COLUMN_BUDGET_CATEGORY = "category";
+    public static final String COLUMN_BUDGET_LIMIT = "limit_amount";
+    public static final String COLUMN_BUDGET_RESET_AT = "reset_at";
     private final Context appContext;
 
     public DatabaseHelper(Context context) {
@@ -57,6 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_MSG_CONTENT + " TEXT, " +
                 COLUMN_MSG_TIME + " TEXT, " +
                 COLUMN_USER_ID + " TEXT DEFAULT 'guest');");
+        createBudgetsTable(db);
     }
 
     @Override
@@ -89,6 +94,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             addUserIdColumnIfNeeded(db, TABLE_TRANSACTIONS);
             addUserIdColumnIfNeeded(db, TABLE_MESSAGES);
         }
+        if (oldVersion < 8) {
+            createBudgetsTable(db);
+        }
+    }
+
+    private void createBudgetsTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_BUDGETS + " (" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_BUDGET_CATEGORY + " TEXT NOT NULL, " +
+                COLUMN_BUDGET_LIMIT + " REAL DEFAULT 0, " +
+                COLUMN_BUDGET_RESET_AT + " INTEGER DEFAULT 0, " +
+                COLUMN_USER_ID + " TEXT DEFAULT 'guest', " +
+                "UNIQUE(" + COLUMN_BUDGET_CATEGORY + ", " + COLUMN_USER_ID + "));");
     }
 
     private void addUserIdColumnIfNeeded(SQLiteDatabase db, String tableName) {
@@ -154,6 +172,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRANSACTIONS, COLUMN_ID + " = ? AND " + COLUMN_USER_ID + " = ?",
                 new String[]{String.valueOf(id), getCurrentUserId()});
+        db.close();
+    }
+
+    public void deleteAllTransactions() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TRANSACTIONS, COLUMN_USER_ID + " = ?", new String[]{getCurrentUserId()});
         db.close();
     }
 
@@ -223,6 +247,106 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return stats;
+    }
+
+    public void saveBudgetLimit(String category, double limitAmount) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_BUDGET_CATEGORY, category);
+        values.put(COLUMN_BUDGET_LIMIT, limitAmount);
+        values.put(COLUMN_USER_ID, getCurrentUserId());
+
+        int updated = db.update(TABLE_BUDGETS, values,
+                COLUMN_BUDGET_CATEGORY + " = ? AND " + COLUMN_USER_ID + " = ?",
+                new String[]{category, getCurrentUserId()});
+        if (updated == 0) {
+            values.put(COLUMN_BUDGET_RESET_AT, 0);
+            db.insert(TABLE_BUDGETS, null, values);
+        }
+        db.close();
+    }
+
+    public Map<String, Double> getBudgetLimits() {
+        Map<String, Double> budgets = new HashMap<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_BUDGET_CATEGORY + ", " + COLUMN_BUDGET_LIMIT +
+                        " FROM " + TABLE_BUDGETS + " WHERE " + COLUMN_USER_ID + " = ?",
+                new String[]{getCurrentUserId()});
+        if (cursor.moveToFirst()) {
+            do {
+                budgets.put(cursor.getString(0), cursor.getDouble(1));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return budgets;
+    }
+
+    public double getBudgetLimit(String category) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_BUDGET_LIMIT + " FROM " + TABLE_BUDGETS +
+                        " WHERE " + COLUMN_BUDGET_CATEGORY + " = ? AND " + COLUMN_USER_ID + " = ?",
+                new String[]{category, getCurrentUserId()});
+        double limit = 0;
+        if (cursor.moveToFirst()) limit = cursor.getDouble(0);
+        cursor.close();
+        db.close();
+        return limit;
+    }
+
+    public long getWalletResetAt() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT MAX(" + COLUMN_BUDGET_RESET_AT + ") FROM " + TABLE_BUDGETS +
+                        " WHERE " + COLUMN_USER_ID + " = ?",
+                new String[]{getCurrentUserId()});
+        long resetAt = 0;
+        if (cursor.moveToFirst()) resetAt = cursor.getLong(0);
+        cursor.close();
+        db.close();
+        return resetAt;
+    }
+
+    public void resetWallet() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_BUDGET_RESET_AT, System.currentTimeMillis());
+        db.update(TABLE_BUDGETS, values, COLUMN_USER_ID + " = ?", new String[]{getCurrentUserId()});
+        db.close();
+    }
+
+    public double getCategoryExpenseSince(String category, long startTimestamp) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(" + COLUMN_AMOUNT + ") FROM " + TABLE_TRANSACTIONS +
+                        " WHERE " + COLUMN_IS_EXPENSE + " = 1 AND " + COLUMN_CATEGORY + " = ?" +
+                        " AND " + COLUMN_TIMESTAMP + " >= ? AND " + COLUMN_USER_ID + " = ?",
+                new String[]{category, String.valueOf(startTimestamp), getCurrentUserId()});
+        double total = 0;
+        if (cursor.moveToFirst()) total = cursor.getDouble(0);
+        cursor.close();
+        db.close();
+        return total;
+    }
+
+    public double getTotalBudgetLimit() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(" + COLUMN_BUDGET_LIMIT + ") FROM " + TABLE_BUDGETS +
+                        " WHERE " + COLUMN_USER_ID + " = ?",
+                new String[]{getCurrentUserId()});
+        double total = 0;
+        if (cursor.moveToFirst()) total = cursor.getDouble(0);
+        cursor.close();
+        db.close();
+        return total;
+    }
+
+    public double getTotalBudgetSpentSinceReset() {
+        long resetAt = getWalletResetAt();
+        Map<String, Double> budgets = getBudgetLimits();
+        double total = 0;
+        for (String category : budgets.keySet()) {
+            total += getCategoryExpenseSince(category, resetAt);
+        }
+        return total;
     }
 
     public Map<String, Double> getIncomeStats(long start, long end) {

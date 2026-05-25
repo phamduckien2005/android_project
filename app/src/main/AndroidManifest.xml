@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -62,6 +61,7 @@
         <activity android:name=".AddTransactionActivity"/>
         <activity android:name=".ReportActivity"/>
         <activity android:name=".AiReceiptActivity"/>
+        <activity android:name=".WalletActivity"/>
         <activity android:name=".SettingsActivity"/>
         <activity android:name=".MessageBoxActivity"/>
         <activity android:name=".DateRangeActivity"/>

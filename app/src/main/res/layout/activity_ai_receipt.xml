@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground"
+    android:background="@color/bg_light"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="AI hóa đơn"
+            android:text="AI Chat"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -26,70 +26,50 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:padding="14dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="260dp"
-                android:background="@drawable/bg_ai_preview">
-
-                <ImageView
-                    android:id="@+id/iv_receipt_preview"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="Ảnh hóa đơn"
-                    android:scaleType="centerCrop"
-                    android:src="@android:drawable/ic_menu_camera" />
-            </FrameLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_take_receipt_photo"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:text="Chụp ảnh"
-                    app:cornerRadius="10dp" />
-
-                <Button
-                    android:id="@+id/btn_pick_receipt_photo"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="1"
-                    android:text="Chọn ảnh"
-                    app:cornerRadius="10dp" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btn_analyze_receipt"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:backgroundTint="?attr/colorPrimary"
-                android:text="Phân tích bằng AI"
-                android:textColor="?attr/colorOnPrimary"
-                android:textStyle="bold"
-                app:cornerRadius="12dp" />
-
-            <ProgressBar
-                android:id="@+id/progress_ai"
+            <TextView
+                android:id="@+id/tv_chat_assistant"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_marginEnd="44dp"
+                android:background="@drawable/bg_chat_assistant"
+                android:padding="14dp"
+                android:text="Mình là AI quản lý chi tiêu. Bạn có thể hỏi đáp bình thường, hoặc bấm + để gửi ảnh hóa đơn."
+                android:textColor="@color/text_main"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tv_chat_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginStart="44dp"
                 android:layout_marginTop="12dp"
+                android:background="@drawable/bg_chat_user"
+                android:padding="14dp"
+                android:text="Chưa có tin nhắn."
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/iv_receipt_preview"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_chat_user"
+                android:contentDescription="Ảnh hóa đơn đã tải lên"
+                android:padding="4dp"
+                android:scaleType="centerCrop"
                 android:visibility="gone" />
 
             <TextView
@@ -97,54 +77,115 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Chụp hoặc chọn ảnh hóa đơn để AI đọc số tiền và danh mục."
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="13sp" />
+                android:text="Sẵn sàng trò chuyện."
+                android:textColor="@color/text_sub"
+                android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/tv_ai_json"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Kết quả giao dịch"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textStyle="bold" />
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/edt_ai_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="Tên giao dịch"
-                android:inputType="text"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textColorHint="?android:attr/textColorSecondary" />
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/edt_ai_amount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Số tiền"
-                android:inputType="numberDecimal"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textColorHint="?android:attr/textColorSecondary" />
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/edt_ai_category"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Danh mục"
-                android:inputType="text"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textColorHint="?android:attr/textColorSecondary" />
-
-            <Button
-                android:id="@+id/btn_save_ai_transaction"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:text="Lưu giao dịch"
-                app:cornerRadius="12dp" />
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progress_ai"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="6dp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/btn_pick_receipt_photo"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_circle_blue"
+            android:text="+"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edt_chat_message"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_chat_input"
+            android:hint="Nhập tin nhắn"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:paddingHorizontal="14dp"
+            android:textColor="@color/text_main"
+            android:textColorHint="@color/text_sub" />
+
+        <Button
+            android:id="@+id/btn_send_chat"
+            android:layout_width="64dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_blue_button"
+            android:text="➤"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="10dp">
+
+        <Button
+            android:id="@+id/btn_analyze_receipt"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_blue_button"
+            android:text="Phân tích"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btn_save_ai_transaction"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_blue_button"
+            android:text="Áp dụng"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
 </LinearLayout>
