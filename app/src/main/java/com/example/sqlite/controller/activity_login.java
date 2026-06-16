@@ -1,4 +1,6 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
+
+import com.example.sqlite.R;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +18,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.example.sqlite.service.UserSession;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -243,3 +246,4 @@ public class activity_login extends AppCompatActivity {
         finish();
     }
 }
+

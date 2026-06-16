@@ -1,10 +1,13 @@
-package com.example.sqlite;
+package com.example.sqlite.service;
 
 import android.graphics.Bitmap;
 import android.util.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.example.sqlite.BuildConfig;
+import com.example.sqlite.dto.ReceiptResultDto;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -20,7 +23,7 @@ public class GeminiReceiptService {
     private static final String ENDPOINT =
             "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL_NAME + ":generateContent?key=";
 
-    public ReceiptResult analyzeReceipt(Bitmap bitmap) throws Exception {
+    public ReceiptResultDto analyzeReceipt(Bitmap bitmap) throws Exception {
         String apiKey = BuildConfig.GEMINI_API_KEY;
         if (apiKey.trim().isEmpty() || apiKey.equals("replace_with_your_gemini_api_key")) {
             throw new IllegalStateException("Bạn cần điền GEMINI_API_KEY trong file .env");
@@ -151,7 +154,7 @@ public class GeminiReceiptService {
                 .put("responseSchema", schema);
     }
 
-    private ReceiptResult parseReceiptResult(String response) throws Exception {
+    private ReceiptResultDto parseReceiptResult(String response) throws Exception {
         String text = parseTextResponse(response);
 
         text = text.replace("```json", "").replace("```", "").trim();
@@ -166,7 +169,7 @@ public class GeminiReceiptService {
         double amount = json.optDouble("amount", 0);
         String category = json.optString("category", "Khác");
         String note = json.optString("note", "");
-        return new ReceiptResult(title, amount, category, note, json.toString(2));
+        return new ReceiptResultDto(title, amount, category, note, json.toString(2));
     }
 
     private String parseTextResponse(String response) throws Exception {
@@ -195,23 +198,4 @@ public class GeminiReceiptService {
         return builder.toString();
     }
 
-    public static class ReceiptResult {
-        public final String title;
-        public final double amount;
-        public final String category;
-        public final String note;
-        public final String rawJson;
-
-        public ReceiptResult(String title, double amount, String category, String note) {
-            this(title, amount, category, note, "");
-        }
-
-        public ReceiptResult(String title, double amount, String category, String note, String rawJson) {
-            this.title = title;
-            this.amount = amount;
-            this.category = category;
-            this.note = note;
-            this.rawJson = rawJson;
-        }
-    }
 }

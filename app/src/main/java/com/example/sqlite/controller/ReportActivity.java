@@ -1,4 +1,6 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
+
+import com.example.sqlite.R;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.example.sqlite.repository.DatabaseHelper;
 import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -213,3 +216,4 @@ public class ReportActivity extends AppCompatActivity {
         }
     }
 }
+

@@ -1,4 +1,6 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
+
+import com.example.sqlite.R;
 
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
@@ -82,3 +84,4 @@ public class ReminderReceiver extends BroadcastReceiver {
         );
     }
 }
+

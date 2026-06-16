@@ -1,4 +1,4 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,7 +11,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.ArrayList;
+
+import com.example.sqlite.R;
+import com.example.sqlite.entity.Message;
+import com.example.sqlite.repository.DatabaseHelper;
+
 import java.util.List;
 
 public class MessageBoxActivity extends AppCompatActivity {
@@ -38,13 +42,6 @@ public class MessageBoxActivity extends AppCompatActivity {
 
         MessageAdapter adapter = new MessageAdapter(messageList);
         rvMessages.setAdapter(adapter);
-    }
-
-    public static class Message {
-        String title, content, time;
-        public Message(String title, String content, String time) {
-            this.title = title; this.content = content; this.time = time;
-        }
     }
 
     private static class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {

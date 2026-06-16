@@ -1,4 +1,6 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
+
+import com.example.sqlite.R;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -20,6 +22,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.sqlite.entity.Transaction;
+import com.example.sqlite.repository.DatabaseHelper;
+import com.example.sqlite.service.UserSession;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
@@ -97,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadData() {
         tvHomeGreeting.setText("Xin chào bạn, " + UserSession.getDisplayName(this));
-        List<TransactionAdapter.Transaction> transactions = dbHelper.getFilteredTransactions(filterStartDate, filterEndDate);
+        List<Transaction> transactions = dbHelper.getFilteredTransactions(filterStartDate, filterEndDate);
 
         currentIncome = dbHelper.getTotalIncome(filterStartDate, filterEndDate);
         currentExpense = dbHelper.getTotalExpense(filterStartDate, filterEndDate);
@@ -126,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         rvMainList.setAdapter(adapter);
     }
 
-    private void editTransaction(TransactionAdapter.Transaction transaction) {
+    private void editTransaction(Transaction transaction) {
         Intent intent = new Intent(this, AddTransactionActivity.class);
         intent.putExtra("isEdit", true);
         intent.putExtra("id", transaction.id);
@@ -340,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_add_top).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, AddTransactionActivity.class)));
         findViewById(R.id.btn_wallet).setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
         findViewById(R.id.btn_view_all).setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
+        findViewById(R.id.fab_ai_chat).setOnClickListener(v -> startActivity(new Intent(this, AiReceiptActivity.class)));
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -347,8 +353,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.nav_history) {
                 startActivity(new Intent(this, HistoryActivity.class));
-            } else if (id == R.id.nav_ai_receipt) {
-                startActivity(new Intent(this, AiReceiptActivity.class));
             } else if (id == R.id.nav_report) {
                 startActivity(new Intent(this, ReportActivity.class));
             } else if (id == R.id.nav_settings) {
@@ -380,3 +384,4 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 }
+

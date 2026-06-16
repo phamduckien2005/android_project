@@ -1,4 +1,4 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -9,31 +9,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.sqlite.R;
+import com.example.sqlite.dto.CategoryDto;
+
 import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
-    public static class Category {
-        String name;
-        int iconRes;
-        String color;
-
-        public Category(String name, int iconRes, String color) {
-            this.name = name;
-            this.iconRes = iconRes;
-            this.color = color;
-        }
-    }
-
-    private List<Category> categories;
+    private List<CategoryDto> categories;
     private OnCategoryClickListener listener;
     private int selectedPosition = -1;
 
     public interface OnCategoryClickListener {
-        void onCategoryClick(Category category);
+        void onCategoryClick(CategoryDto category);
     }
 
-    public CategoryAdapter(List<Category> categories, OnCategoryClickListener listener) {
+    public CategoryAdapter(List<CategoryDto> categories, OnCategoryClickListener listener) {
         this.categories = categories;
         this.listener = listener;
     }
@@ -47,7 +39,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
-        Category category = categories.get(position);
+        CategoryDto category = categories.get(position);
         holder.tvName.setText(category.name);
         holder.ivIcon.setImageResource(category.iconRes);
         

@@ -1,4 +1,4 @@
-package com.example.sqlite;
+package com.example.sqlite.service;
 
 import android.content.Context;
 import android.content.SharedPreferences;

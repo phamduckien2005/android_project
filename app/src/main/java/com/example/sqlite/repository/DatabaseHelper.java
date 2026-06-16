@@ -1,10 +1,14 @@
-package com.example.sqlite;
+package com.example.sqlite.repository;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.example.sqlite.entity.Message;
+import com.example.sqlite.entity.Transaction;
+import com.example.sqlite.service.UserSession;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -181,8 +185,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<TransactionAdapter.Transaction> getFilteredTransactions(long start, long end) {
-        List<TransactionAdapter.Transaction> transactions = new ArrayList<>();
+    public List<Transaction> getFilteredTransactions(long start, long end) {
+        List<Transaction> transactions = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_TRANSACTIONS + 
                        " WHERE " + COLUMN_TIMESTAMP + " >= ? AND " + COLUMN_TIMESTAMP + " <= ?" +
@@ -196,9 +200,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
                 String time = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TIME));
                 double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_AMOUNT));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY));
                 boolean isExpense = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_EXPENSE)) == 1;
                 long timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIMESTAMP));
-                transactions.add(new TransactionAdapter.Transaction(id, title, time, amount, isExpense, timestamp));
+                transactions.add(new Transaction(id, title, time, amount, isExpense, timestamp, category));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -310,6 +315,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_BUDGET_RESET_AT, System.currentTimeMillis());
+        values.put(COLUMN_BUDGET_LIMIT, 0);
         db.update(TABLE_BUDGETS, values, COLUMN_USER_ID + " = ?", new String[]{getCurrentUserId()});
         db.close();
     }
@@ -377,8 +383,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_MESSAGES, null, values);
         db.close();
     }
-    public List<MessageBoxActivity.Message> getAllMessages() {
-        List<MessageBoxActivity.Message> list = new ArrayList<>();
+    public List<Message> getAllMessages() {
+        List<Message> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(
@@ -387,7 +393,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                list.add(new MessageBoxActivity.Message(
+                list.add(new Message(
                         cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MSG_TITLE)),
                         cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MSG_CONTENT)),
                         cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MSG_TIME))

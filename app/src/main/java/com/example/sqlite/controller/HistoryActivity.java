@@ -1,4 +1,6 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
+
+import com.example.sqlite.R;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -15,6 +17,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.sqlite.entity.Transaction;
+import com.example.sqlite.repository.DatabaseHelper;
 import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +32,7 @@ public class HistoryActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private EditText edtSearch;
     private TransactionAdapter adapter;
-    private List<TransactionAdapter.Transaction> allTransactions;
+    private List<Transaction> allTransactions;
     private DatabaseHelper dbHelper;
     
     // Mặc định là lọc tất cả thời gian
@@ -107,8 +112,8 @@ public class HistoryActivity extends AppCompatActivity {
         String query = edtSearch.getText().toString().toLowerCase().trim();
         int tabPosition = tabLayoutFilter.getSelectedTabPosition();
         
-        List<TransactionAdapter.Transaction> filteredList = new ArrayList<>();
-        for (TransactionAdapter.Transaction t : allTransactions) {
+        List<Transaction> filteredList = new ArrayList<>();
+        for (Transaction t : allTransactions) {
             // 1. Lọc theo Tab (Thu/Chi)
             boolean matchesTab = (tabPosition == 0) || 
                                  (tabPosition == 1 && !t.isExpense) || 
@@ -143,7 +148,7 @@ public class HistoryActivity extends AppCompatActivity {
         rvHistoryList.setAdapter(adapter);
     }
 
-    private void editTransaction(TransactionAdapter.Transaction transaction) {
+    private void editTransaction(Transaction transaction) {
         Intent intent = new Intent(this, AddTransactionActivity.class);
         intent.putExtra("isEdit", true);
         intent.putExtra("id", transaction.id);
@@ -186,7 +191,7 @@ public class HistoryActivity extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getAdapterPosition();
-                TransactionAdapter.Transaction transaction = adapter.getTransactionList().get(position);
+                Transaction transaction = adapter.getTransactionList().get(position);
                 if (transaction != null && !transaction.isHeader) {
                     confirmDelete(transaction.id);
                 }
@@ -196,3 +201,4 @@ public class HistoryActivity extends AppCompatActivity {
         new ItemTouchHelper(simpleItemTouchCallback).attachToRecyclerView(rvHistoryList);
     }
 }
+

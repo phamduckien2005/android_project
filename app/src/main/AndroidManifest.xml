@@ -34,7 +34,7 @@
         </activity>
         <!-- LOGIN -->
         <activity
-            android:name=".activity_login"
+            android:name=".controller.activity_login"
             android:exported="true">
 
             <intent-filter>
@@ -48,27 +48,27 @@
 
         <!-- REGISTER -->
         <activity
-            android:name=".activity_register"
+            android:name=".controller.activity_register"
             android:exported="false"/>
 
         <!-- MAIN -->
         <activity
-            android:name=".MainActivity"
+            android:name=".controller.MainActivity"
             android:exported="false"/>
 
         <!-- OTHER ACTIVITIES -->
-        <activity android:name=".HistoryActivity"/>
-        <activity android:name=".AddTransactionActivity"/>
-        <activity android:name=".ReportActivity"/>
-        <activity android:name=".AiReceiptActivity"/>
-        <activity android:name=".WalletActivity"/>
-        <activity android:name=".SettingsActivity"/>
-        <activity android:name=".MessageBoxActivity"/>
-        <activity android:name=".DateRangeActivity"/>
+        <activity android:name=".controller.HistoryActivity"/>
+        <activity android:name=".controller.AddTransactionActivity"/>
+        <activity android:name=".controller.ReportActivity"/>
+        <activity android:name=".controller.AiReceiptActivity"/>
+        <activity android:name=".controller.WalletActivity"/>
+        <activity android:name=".controller.SettingsActivity"/>
+        <activity android:name=".controller.MessageBoxActivity"/>
+        <activity android:name=".controller.DateRangeActivity"/>
 
         <!-- RECEIVER -->
         <receiver
-            android:name=".ReminderReceiver"
+            android:name=".controller.ReminderReceiver"
             android:exported="false"/>
 
     </application>

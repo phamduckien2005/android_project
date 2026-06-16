@@ -1,4 +1,6 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
+
+import com.example.sqlite.R;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -11,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.sqlite.dto.CategoryDto;
+import com.example.sqlite.repository.DatabaseHelper;
 import com.google.android.material.tabs.TabLayout;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,22 +74,22 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void setupCategories() {
-        List<CategoryAdapter.Category> categories = new ArrayList<>();
-        categories.add(new CategoryAdapter.Category("Ăn uống", android.R.drawable.ic_menu_today, "#FF7043"));
-        categories.add(new CategoryAdapter.Category("Di chuyển", android.R.drawable.ic_menu_directions, "#42A5F5"));
-        categories.add(new CategoryAdapter.Category("Mua sắm", android.R.drawable.ic_menu_save, "#AB47BC"));
-        categories.add(new CategoryAdapter.Category("Sắc đẹp", android.R.drawable.ic_menu_camera, "#42A5F5"));
-        categories.add(new CategoryAdapter.Category("Ăn vặt", android.R.drawable.ic_menu_view, "#FFA726"));
-        categories.add(new CategoryAdapter.Category("Học tập", android.R.drawable.ic_menu_edit, "#66BB6A"));
-        categories.add(new CategoryAdapter.Category("Giải trí", android.R.drawable.ic_menu_slideshow, "#FFCA28"));
-        categories.add(new CategoryAdapter.Category("Tiền nhà", android.R.drawable.ic_menu_myplaces, "#26A69A"));
-        categories.add(new CategoryAdapter.Category("Sức khỏe", android.R.drawable.ic_menu_add, "#EF5350"));
-        categories.add(new CategoryAdapter.Category("Tiền điện", android.R.drawable.ic_menu_info_details, "#5C6BC0"));
-        categories.add(new CategoryAdapter.Category("Tiền nước", android.R.drawable.ic_menu_gallery, "#29B6F6"));
-        categories.add(new CategoryAdapter.Category("Internet", android.R.drawable.ic_menu_share, "#78909C"));
-        categories.add(new CategoryAdapter.Category("Quà tặng", android.R.drawable.ic_menu_send, "#8D6E63"));
-        categories.add(new CategoryAdapter.Category("Lương", android.R.drawable.ic_menu_month, "#9CCC65"));
-        categories.add(new CategoryAdapter.Category("Khác", android.R.drawable.ic_menu_help, "#BDBDBD"));
+        List<CategoryDto> categories = new ArrayList<>();
+        categories.add(new CategoryDto("Ăn uống", android.R.drawable.ic_menu_today, "#FF7043"));
+        categories.add(new CategoryDto("Di chuyển", android.R.drawable.ic_menu_directions, "#42A5F5"));
+        categories.add(new CategoryDto("Mua sắm", android.R.drawable.ic_menu_save, "#AB47BC"));
+        categories.add(new CategoryDto("Sắc đẹp", android.R.drawable.ic_menu_camera, "#42A5F5"));
+        categories.add(new CategoryDto("Ăn vặt", android.R.drawable.ic_menu_view, "#FFA726"));
+        categories.add(new CategoryDto("Học tập", android.R.drawable.ic_menu_edit, "#66BB6A"));
+        categories.add(new CategoryDto("Giải trí", android.R.drawable.ic_menu_slideshow, "#FFCA28"));
+        categories.add(new CategoryDto("Tiền nhà", android.R.drawable.ic_menu_myplaces, "#26A69A"));
+        categories.add(new CategoryDto("Sức khỏe", android.R.drawable.ic_menu_add, "#EF5350"));
+        categories.add(new CategoryDto("Tiền điện", android.R.drawable.ic_menu_info_details, "#5C6BC0"));
+        categories.add(new CategoryDto("Tiền nước", android.R.drawable.ic_menu_gallery, "#29B6F6"));
+        categories.add(new CategoryDto("Internet", android.R.drawable.ic_menu_share, "#78909C"));
+        categories.add(new CategoryDto("Quà tặng", android.R.drawable.ic_menu_send, "#8D6E63"));
+        categories.add(new CategoryDto("Lương", android.R.drawable.ic_menu_month, "#9CCC65"));
+        categories.add(new CategoryDto("Khác", android.R.drawable.ic_menu_help, "#BDBDBD"));
 
         CategoryAdapter categoryAdapter = new CategoryAdapter(categories, category -> selectedCategory = category.name);
         rvCategories.setLayoutManager(new GridLayoutManager(this, 4));
@@ -173,3 +178,4 @@ public class AddTransactionActivity extends AppCompatActivity {
         edtAmount.setSelection(edtAmount.getText().length());
     }
 }
+

@@ -1,4 +1,4 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -8,6 +8,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.sqlite.R;
+import com.example.sqlite.entity.Transaction;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,32 +29,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public void setOnItemLongClickListener(OnItemLongClickListener listener) {
         this.longClickListener = listener;
-    }
-
-    public static class Transaction {
-        int id;
-        String title;
-        String time;
-        double amount;
-        boolean isExpense;
-        long timestamp; 
-        boolean isHeader = false;
-        String daySummary = "";
-
-        public Transaction(int id, String title, String time, double amount, boolean isExpense, long timestamp) {
-            this.id = id;
-            this.title = title;
-            this.time = time;
-            this.amount = amount;
-            this.isExpense = isExpense;
-            this.timestamp = timestamp;
-        }
-
-        public Transaction(String date, String summary) {
-            this.title = date;
-            this.daySummary = summary;
-            this.isHeader = true;
-        }
     }
 
     private List<Transaction> displayList;

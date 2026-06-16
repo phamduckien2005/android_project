@@ -27,22 +27,55 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="12dp">
 
         <LinearLayout
-            android:id="@+id/layout_wallet_categories"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp" />
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_auth_card"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ví chi tiêu"
+                    android:textColor="@color/text_main"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Đặt hạn mức cho từng danh mục, hoặc làm mới ví để đưa tất cả hạn mức về 0."
+                    android:textColor="@color/text_sub"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_wallet_categories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical" />
+        </LinearLayout>
     </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@drawable/bg_wallet_footer"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="14dp">
 
         <Button
             android:id="@+id/btn_delete_all_transactions"
@@ -51,7 +84,8 @@
             android:backgroundTint="@color/expense_red"
             android:text="Xóa lịch sử giao dịch"
             android:textAllCaps="false"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -64,8 +98,11 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
+                android:backgroundTint="@color/primary_light_blue"
                 android:text="Làm mới ví"
-                android:textAllCaps="false" />
+                android:textAllCaps="false"
+                android:textColor="?attr/colorPrimary"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btn_save_wallet"
@@ -76,7 +113,8 @@
                 android:background="@drawable/bg_blue_button"
                 android:text="Lưu ví"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

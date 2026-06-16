@@ -1,4 +1,6 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
+
+import com.example.sqlite.R;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -112,3 +114,4 @@ public class activity_register extends AppCompatActivity {
         finish();
     }
 }
+

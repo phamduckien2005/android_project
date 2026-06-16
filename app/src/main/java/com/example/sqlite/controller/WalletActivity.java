@@ -1,9 +1,15 @@
-package com.example.sqlite;
+package com.example.sqlite.controller;
+
+import com.example.sqlite.R;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -12,6 +18,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import com.example.sqlite.repository.DatabaseHelper;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -55,56 +63,122 @@ public class WalletActivity extends AppCompatActivity {
         layoutCategories.removeAllViews();
         budgetInputs.clear();
 
-        for (String category : CATEGORIES) {
+        for (int i = 0; i < CATEGORIES.length; i++) {
+            String category = CATEGORIES[i];
             double limit = budgets.containsKey(category) ? budgets.get(category) : 0;
             double spent = dbHelper.getCategoryExpenseSince(category, resetAt);
             double remaining = Math.max(0, limit - spent);
 
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.VERTICAL);
-            row.setPadding(18, 16, 18, 16);
-            row.setBackgroundResource(R.drawable.bg_auth_card);
+            row.setPadding(dp(16), dp(16), dp(16), dp(16));
+            row.setBackground(roundedRect("#F8FCFF", 18, "#D6E8FA", 1));
 
             LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
-            rowParams.setMargins(0, 0, 0, 12);
+            rowParams.setMargins(0, 0, 0, dp(16));
             layoutCategories.addView(row, rowParams);
+
+            LinearLayout titleRow = new LinearLayout(this);
+            titleRow.setGravity(Gravity.CENTER_VERTICAL);
+            titleRow.setOrientation(LinearLayout.HORIZONTAL);
+            row.addView(titleRow, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+
+            TextView badge = new TextView(this);
+            badge.setText(category.substring(0, 1));
+            badge.setGravity(Gravity.CENTER);
+            badge.setTextColor(Color.WHITE);
+            badge.setTextSize(16);
+            badge.setTypeface(null, Typeface.BOLD);
+            badge.setBackground(roundedRect("#58A9F7", 16));
+            LinearLayout.LayoutParams badgeParams = new LinearLayout.LayoutParams(dp(38), dp(38));
+            badgeParams.setMargins(0, 0, dp(12), 0);
+            titleRow.addView(badge, badgeParams);
+
+            LinearLayout textBox = new LinearLayout(this);
+            textBox.setOrientation(LinearLayout.VERTICAL);
+            titleRow.addView(textBox, new LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1
+            ));
 
             TextView title = new TextView(this);
             title.setText(category);
             title.setTextSize(16);
             title.setTextColor(getColorCompat(R.color.text_main));
-            title.setTypeface(null, android.graphics.Typeface.BOLD);
-            row.addView(title);
+            title.setTypeface(null, Typeface.BOLD);
+            textBox.addView(title);
 
             TextView usage = new TextView(this);
             usage.setText(String.format(Locale.getDefault(), "Đã chi: %,.0f đ | Còn lại: %,.0f đ", spent, remaining));
             usage.setTextColor(getColorCompat(R.color.text_sub));
             usage.setTextSize(13);
-            row.addView(usage);
+            textBox.addView(usage);
+
+            View divider = new View(this);
+            divider.setBackgroundColor(Color.parseColor("#E1EDF8"));
+            LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(1)
+            );
+            dividerParams.setMargins(0, dp(14), 0, dp(12));
+            row.addView(divider, dividerParams);
+
+            TextView inputLabel = new TextView(this);
+            inputLabel.setText("Hạn mức tối đa");
+            inputLabel.setTextColor(getColorCompat(R.color.text_sub));
+            inputLabel.setTextSize(12);
+            inputLabel.setTypeface(null, Typeface.BOLD);
+            row.addView(inputLabel);
 
             EditText input = new EditText(this);
             input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            input.setHint("Hạn mức tối đa");
+            input.setHint("Nhập số tiền cho mục này");
             input.setGravity(Gravity.CENTER_VERTICAL);
             input.setSingleLine(true);
+            input.setMinHeight(dp(48));
+            input.setPadding(dp(14), 0, dp(14), 0);
+            input.setBackgroundResource(R.drawable.bg_wallet_input);
             input.setTextColor(getColorCompat(R.color.text_main));
             input.setHintTextColor(getColorCompat(R.color.text_sub));
             if (limit > 0) {
                 input.setText(String.format(Locale.US, "%.0f", limit));
             }
-            row.addView(input, new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams inputParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
+            );
+            inputParams.setMargins(0, dp(6), 0, 0);
+            row.addView(input, inputParams);
             budgetInputs.put(category, input);
         }
     }
 
     private int getColorCompat(int colorRes) {
         return androidx.core.content.ContextCompat.getColor(this, colorRes);
+    }
+
+    private int dp(int value) {
+        return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    private GradientDrawable roundedRect(String fillColor, int radiusDp) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setColor(Color.parseColor(fillColor));
+        drawable.setCornerRadius(dp(radiusDp));
+        return drawable;
+    }
+
+    private GradientDrawable roundedRect(String fillColor, int radiusDp, String strokeColor, int strokeDp) {
+        GradientDrawable drawable = roundedRect(fillColor, radiusDp);
+        drawable.setStroke(dp(strokeDp), Color.parseColor(strokeColor));
+        return drawable;
     }
 
     private void handleEvents() {
@@ -136,10 +210,10 @@ public class WalletActivity extends AppCompatActivity {
     private void confirmResetWallet() {
         new AlertDialog.Builder(this)
                 .setTitle("Làm mới ví")
-                .setMessage("Bạn muốn làm mới lại ví này?")
+                .setMessage("Bạn muốn đưa toàn bộ hạn mức danh mục về 0?")
                 .setPositiveButton("Có", (dialog, which) -> {
                     dbHelper.resetWallet();
-                    Toast.makeText(this, "Đã làm mới ví", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Đã làm mới ví và đưa hạn mức về 0", Toast.LENGTH_SHORT).show();
                     renderCategories();
                 })
                 .setNegativeButton("Không", null)
@@ -160,3 +234,4 @@ public class WalletActivity extends AppCompatActivity {
                 .show();
     }
 }
+
